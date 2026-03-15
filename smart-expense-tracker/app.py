@@ -42,7 +42,7 @@ if st.sidebar.button("Predict Category"):
 # Analytics Section
 st.subheader("📊 Expense Analytics")
 
-df = pd.read_csv("dataset.csv")
+df = pd.read_csv("smart-expense-tracker/dataset.csv")
 
 category_counts = df['Category'].value_counts()
 
