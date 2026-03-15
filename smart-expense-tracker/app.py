@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 # Load trained model
-model = joblib.load("expense_model.pkl")
+model = joblib.load("smart-expense-tracker/expense_model.pkl")
 
 st.set_page_config(page_title="Smart Expense Tracker", layout="wide")
 
