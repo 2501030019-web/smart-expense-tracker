@@ -19,23 +19,19 @@ def set_bg(image_file):
         with open(image_file, "rb") as f:
             encoded = base64.b64encode(f.read()).decode()
 
-        bg = f"""
-       st.markdown(
+        st.markdown(
 """
 <style>
 .stApp {
 background-image: url("https://images.unsplash.com/photo-1554224155-6726b3ff858f");
 background-size: cover;
 background-position: center;
+background-attachment: fixed;
 }
 </style>
 """,
 unsafe_allow_html=True
 )
-        """
-        st.markdown(bg, unsafe_allow_html=True)
-
-set_bg("background.jpg")
 
 # ---------- Lottie Animation ----------
 def load_lottie(url):
