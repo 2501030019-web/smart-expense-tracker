@@ -20,20 +20,18 @@ def set_bg(image_file):
             encoded = base64.b64encode(f.read()).decode()
 
         bg = f"""
-        <style>
-        .stApp {{
-        background-image: url("data:image/png;base64,{encoded}");
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-        }}
-
-        .block-container {{
-        background: rgba(0,0,0,0.6);
-        padding: 2rem;
-        border-radius: 15px;
-        }}
-        </style>
+       st.markdown(
+"""
+<style>
+.stApp {
+background-image: url("https://images.unsplash.com/photo-1554224155-6726b3ff858f");
+background-size: cover;
+background-position: center;
+}
+</style>
+""",
+unsafe_allow_html=True
+)
         """
         st.markdown(bg, unsafe_allow_html=True)
 
