@@ -8,7 +8,6 @@ import pickle
 
 # ---------- Load Model ----------
 model = pickle.load(open("expense_model.pkl", "rb"))
-
 # ---------- Prediction Function ----------
 def predict_category(amount, note):
     try:
