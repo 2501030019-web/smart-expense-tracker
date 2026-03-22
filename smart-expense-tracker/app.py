@@ -7,8 +7,7 @@ import plotly.express as px
 import pickle
 
 # ---------- Load Model ----------
-model_path = os.path.join(os.getcwd(), "expense_model.pkl")
-model = pickle.load(open(model_path, "rb"))
+model = pickle.load(open("expense_model.pkl", "rb"))
 
 # ---------- Prediction Function ----------
 def predict_category(amount, note):
