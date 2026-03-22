@@ -4,8 +4,27 @@ import requests
 import base64
 import os
 import plotly.express as px
+import pickle
 
-# Safe import
+# ---------- Load Model ----------
+model = pickle.load(open("expense_model.pkl", "rb"))
+
+# ---------- Prediction Function ----------
+def predict_category(amount, note):
+    try:
+        # ⚠️ Change this according to your training
+        input_data = pd.DataFrame({
+            "Amount": [amount],
+            "Note": [note]
+        })
+
+        prediction = model.predict(input_data)[0]
+        return prediction
+
+    except:
+        return "Other"
+
+# ---------- Lottie ----------
 try:
     from streamlit_lottie import st_lottie
 except:
@@ -13,13 +32,7 @@ except:
 
 st.set_page_config(page_title="Smart Expense Tracker", layout="wide")
 
-# ---------- Background Function ----------
-def set_bg(image_file):
-    if os.path.exists(image_file):
-        with open(image_file, "rb") as f:
-            encoded = base64.b64encode(f.read()).decode()
-
-        # Background CSS
+# ---------- Background ----------
 st.markdown("""
 <style>
 [data-testid="stAppViewContainer"]{
@@ -33,14 +46,10 @@ background-attachment: fixed;
 [data-testid="stHeader"]{
 background: rgba(0,0,0,0);
 }
-
-[data-testid="stToolbar"]{
-right: 2rem;
-}
 </style>
 """, unsafe_allow_html=True)
 
-# ---------- Lottie Animation ----------
+# ---------- Lottie Function ----------
 def load_lottie(url):
     try:
         r = requests.get(url)
@@ -59,17 +68,17 @@ col1, col2 = st.columns([2,1])
 
 with col1:
     st.title("💰 Smart Expense Tracker")
-    st.write("Track your daily expenses with a modern dashboard")
+    st.write("Track your daily expenses with AI-powered category prediction 🤖")
 
 with col2:
     if st_lottie and lottie_money:
         st_lottie(lottie_money, height=200)
 
-# ---------- Session State ----------
+# ---------- Session ----------
 if "expenses" not in st.session_state:
     st.session_state.expenses = []
 
-# ---------- Expense Form ----------
+# ---------- Form ----------
 st.subheader("➕ Add New Expense")
 
 col1, col2, col3 = st.columns(3)
@@ -78,28 +87,28 @@ with col1:
     date = st.date_input("Date")
 
 with col2:
-    category = st.selectbox(
-        "Category",
-        ["Food","Travel","Shopping","Bills","Entertainment","Other"]
-    )
+    st.write("🤖 Category will be predicted automatically")
 
 with col3:
     amount = st.number_input("Amount", min_value=0)
 
 note = st.text_input("Note")
 
+# ---------- Add Button ----------
 if st.button("Add Expense"):
+
+    predicted_category = predict_category(amount, note)
 
     new_expense = {
         "Date": date,
-        "Category": category,
+        "Category": predicted_category,
         "Amount": amount,
         "Note": note
     }
 
     st.session_state.expenses.append(new_expense)
 
-    st.success("Expense Added Successfully ✅")
+    st.success(f"Expense Added under '{predicted_category}' ✅")
 
 # ---------- Data ----------
 df = pd.DataFrame(st.session_state.expenses)
@@ -115,13 +124,14 @@ if not df.empty:
 
     col1.metric("💵 Total Expense", f"₹ {total_expense}")
 
+    # Category-wise totals
     food_total = df[df["Category"]=="Food"]["Amount"].sum()
     col2.metric("🍔 Food Expense", f"₹ {food_total}")
 
     travel_total = df[df["Category"]=="Travel"]["Amount"].sum()
     col3.metric("🚕 Travel Expense", f"₹ {travel_total}")
 
-    # ---------- Charts ----------
+    # ---------- Analytics ----------
     st.subheader("📈 Expense Analytics")
 
     col1, col2 = st.columns(2)
@@ -131,7 +141,7 @@ if not df.empty:
             df,
             values="Amount",
             names="Category",
-            title="Expense Distribution"
+            title="Predicted Category Distribution"
         )
         st.plotly_chart(fig, use_container_width=True)
 
@@ -141,13 +151,18 @@ if not df.empty:
             x="Category",
             y="Amount",
             color="Category",
-            title="Expense by Category"
+            title="Predicted Expense by Category"
         )
         st.plotly_chart(fig2, use_container_width=True)
 
-    # ---------- Expense History ----------
-    st.subheader("🧾 Expense History")
+    # ---------- Summary (IMPORTANT FOR MAM) ----------
+    st.subheader("📊 Category-wise Prediction Summary")
 
+    summary = df.groupby("Category")["Amount"].sum()
+    st.bar_chart(summary)
+
+    # ---------- History ----------
+    st.subheader("🧾 Expense History")
     st.dataframe(df, use_container_width=True)
 
 else:
