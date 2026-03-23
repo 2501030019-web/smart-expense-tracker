@@ -9,7 +9,8 @@ import pickle
 # ---------- Load Model ----------
 try:
     model = pickle.load(open("expense_model.pkl", "rb"))
-except:
+except Exception as e:
+    st.error(f"❌ Model loading failed: {e}")
     model = None
 
 # ---------- Prediction Function ----------
