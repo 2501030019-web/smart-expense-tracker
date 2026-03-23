@@ -15,20 +15,21 @@ except Exception as e:
 
 # ---------- Prediction Function ----------
 def predict_category(amount, note):
-    try:
-        if model is None:
-            return "Other"
 
-        # 👉 Adjust according to your training
+    if model is None:
+        return "Model_Not_Loaded"
+
+    try:
         input_data = pd.DataFrame({
             "Amount": [amount],
             "Note": [note]
         })
 
-        return model.predict(input_data)[0]
+        prediction = model.predict(input_data)[0]
+        return prediction
 
-    except:
-        return "Other"
+    except Exception as e:
+        return "Prediction_Error"
 
 # ---------- Page Config ----------
 st.set_page_config(page_title="Smart Expense Tracker", layout="wide")
